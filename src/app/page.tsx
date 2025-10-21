@@ -5,19 +5,52 @@ import FileUpload from '@/components/FileUpload';
 import PlaylistCreator from '@/components/PlaylistCreator';
 import { ShazamTrack } from '@/lib/csv-parser';
 import { ExternalLink, Music2, Youtube, Radio, Mic, Headphones, Disc, Volume2, Music, Smartphone } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
+
+// Types for animated background components
+interface MusicIcon {
+  id: number;
+  Icon: LucideIcon;
+  color: string;
+  size: number;
+  top: number;
+  left: number;
+  delay: number;
+  duration: number;
+  opacity: number;
+  animationType: string;
+}
+
+interface WaveCircle {
+  id: number;
+  color: string;
+  size: number;
+  top: number;
+  left: number;
+  delay: number;
+}
+
+interface Equalizer {
+  id: number;
+  bars: number;
+  top: number;
+  left: number;
+  barColors: string[];
+  delays: number[];
+}
 
 // Animated Background Component
 function AnimatedBackground() {
-  const [musicIcons, setMusicIcons] = useState([]);
-  const [waveCircles, setWaveCircles] = useState([]);
-  const [equalizers, setEqualizers] = useState([]);
+  const [musicIcons, setMusicIcons] = useState<MusicIcon[]>([]);
+  const [waveCircles, setWaveCircles] = useState<WaveCircle[]>([]);
+  const [equalizers, setEqualizers] = useState<Equalizer[]>([]);
 
-  const icons = [Music2, Radio, Mic, Headphones, Disc, Volume2, Music, Smartphone];
-  const colors = ['blue', 'purple', 'pink', 'cyan', 'indigo', 'violet', 'fuchsia'];
+  const icons: LucideIcon[] = [Music2, Radio, Mic, Headphones, Disc, Volume2, Music, Smartphone];
+  const colors: string[] = ['blue', 'purple', 'pink', 'cyan', 'indigo', 'violet', 'fuchsia'];
 
   // Helper function to get color RGB values
-  const getColorRGB = (color) => {
-    const colorMap = {
+  const getColorRGB = (color: string): string => {
+    const colorMap: Record<string, string> = {
       blue: 'rgba(59, 130, 246, 0.1)',
       purple: 'rgba(147, 51, 234, 0.1)',
       pink: 'rgba(236, 72, 153, 0.1)',
@@ -29,8 +62,8 @@ function AnimatedBackground() {
     return colorMap[color] || colorMap.blue;
   };
 
-  const getEqualizerColor = (color) => {
-    const colorMap = {
+  const getEqualizerColor = (color: string): string => {
+    const colorMap: Record<string, string> = {
       blue: 'rgba(96, 165, 250, 0.25)',
       purple: 'rgba(168, 85, 247, 0.25)',
       pink: 'rgba(244, 114, 182, 0.25)',
@@ -42,8 +75,8 @@ function AnimatedBackground() {
     return colorMap[color] || colorMap.blue;
   };
 
-  const getIconColor = (color) => {
-    const colorMap = {
+  const getIconColor = (color: string): string => {
+    const colorMap: Record<string, string> = {
       blue: '#60a5fa',
       purple: '#a855f7',
       pink: '#f472b6',
@@ -57,7 +90,7 @@ function AnimatedBackground() {
 
   useEffect(() => {
     // Generate 40 random music icons
-    const generatedIcons = Array.from({ length: 40 }, (_, i) => {
+    const generatedIcons: MusicIcon[] = Array.from({ length: 40 }, (_, i) => {
       const Icon = icons[Math.floor(Math.random() * icons.length)];
       const color = colors[Math.floor(Math.random() * colors.length)];
       const size = Math.floor(Math.random() * 4) + 6; // 6-9 (w-6 to w-9)
@@ -84,7 +117,7 @@ function AnimatedBackground() {
     setMusicIcons(generatedIcons);
 
     // Generate 12 wave circles
-    const generatedCircles = Array.from({ length: 12 }, (_, i) => {
+    const generatedCircles: WaveCircle[] = Array.from({ length: 12 }, (_, i) => {
       const color = colors[Math.floor(Math.random() * colors.length)];
       const size = Math.floor(Math.random() * 200) + 200; // 200-400px
       const top = Math.random() * 90; // 0-90%
@@ -103,7 +136,7 @@ function AnimatedBackground() {
     setWaveCircles(generatedCircles);
 
     // Generate 8 equalizer sets
-    const generatedEqualizers = Array.from({ length: 8 }, (_, i) => {
+    const generatedEqualizers: Equalizer[] = Array.from({ length: 8 }, (_, i) => {
       const bars = Math.floor(Math.random() * 3) + 3; // 3-5 bars
       const top = Math.random() * 90; // 0-90%
       const left = Math.random() * 90; // 0-90%
