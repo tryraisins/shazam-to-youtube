@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import FileUpload from '@/components/FileUpload';
 import PlaylistCreator from '@/components/PlaylistCreator';
+import { ShazamTrack } from '@/lib/csv-parser';
 
 export default function Home() {
-  const [tracks, setTracks] = useState<any[]>([]);
+  const [tracks, setTracks] = useState<ShazamTrack[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessToken, setAccessToken] = useState<string>('');
 
@@ -23,7 +24,7 @@ export default function Home() {
 
         <div className="space-y-8">
           <FileUpload onTracksParsed={setTracks} />
-          
+
           {tracks.length > 0 && (
             <PlaylistCreator
               tracks={tracks}
