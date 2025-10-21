@@ -9,15 +9,26 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@googleapis/youtube": "^29.0.0",
+    "csv-parse": "^6.1.0",
+    "csv-parser": "^3.2.0",
+    "formidable": "^3.5.4",
+    "google-auth-library": "^10.4.1",
     "googleapis": "^164.1.0",
     "next": "15.5.6",
+    "next-auth": "^4.24.11",
+    "papaparse": "^5.5.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-dropzone": "^14.3.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/csv-parse": "^1.1.12",
+    "@types/formidable": "^3.4.6",
     "@types/node": "^20",
+    "@types/papaparse": "^5.3.16",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

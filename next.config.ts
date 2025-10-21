@@ -1,7 +1,14 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    turbo: {
+      rules: {
+        '*.csv': {
+          loaders: ['file-loader'],
+        },
+      },
+    },
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
