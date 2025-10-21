@@ -10,6 +10,7 @@ interface PlaylistCreationResult {
   addedTracks: number;
   failedTracks: number;
   error?: string;
+  action?: 'created' | 'replaced' | 'updated';
 }
 
 interface PlaylistCreatorProps {
@@ -20,6 +21,8 @@ interface PlaylistCreatorProps {
   onTokenChange: (token: string) => void;
 }
 
+type ExistingPlaylistAction = 'overwrite' | 'update' | 'new_name';
+
 export default function PlaylistCreator({
   tracks,
   isAuthenticated,
@@ -27,15 +30,17 @@ export default function PlaylistCreator({
   onAuthChange,
   onTokenChange,
 }: PlaylistCreatorProps) {
-  const [playlistTitle, setPlaylistTitle] = useState('My Shazam Playlist');
+  const [playlistTitle, setPlaylistTitle] = useState('My Shazam Tracks');
   const [isCreating, setIsCreating] = useState(false);
   const [result, setResult] = useState<PlaylistCreationResult | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [showExistingPlaylistDialog, setShowExistingPlaylistDialog] = useState(false);
+  const [existingPlaylistAction, setExistingPlaylistAction] = useState<ExistingPlaylistAction>('overwrite');
+  const [customPlaylistName, setCustomPlaylistName] = useState('');
 
   // Handle OAuth callback from popup
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Check origin for security
       if (event.origin !== window.location.origin) return;
       
       if (event.data.type === 'youtube-auth-success') {
@@ -53,11 +58,32 @@ export default function PlaylistCreator({
     };
 
     window.addEventListener('message', handleMessage);
-    
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
+    return () => window.removeEventListener('message', handleMessage);
   }, [onAuthChange, onTokenChange]);
+
+  const checkExistingPlaylist = async (): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/check-playlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          accessToken,
+          playlistTitle: playlistTitle,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.exists;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking existing playlist:', error);
+      return false;
+    }
+  };
 
   const authenticateWithYouTube = async () => {
     setAuthLoading(true);
@@ -75,27 +101,17 @@ export default function PlaylistCreator({
         throw new Error('No authentication URL received');
       }
       
-      console.log('Opening auth in new tab:', authUrl);
-      
-      // Open in new tab instead of redirecting
-      const popup = window.open(
-        authUrl,
-        'youtube-auth',
-        'width=600,height=700,left=100,top=100'
-      );
+      const popup = window.open(authUrl, 'youtube-auth', 'width=600,height=700,left=100,top=100');
       
       if (!popup) {
         throw new Error('Popup blocked. Please allow popups for this site.');
       }
       
-      // Check if popup is closed (fallback mechanism)
       const checkPopup = setInterval(() => {
         if (popup.closed) {
           clearInterval(checkPopup);
           if (!isAuthenticated) {
             setAuthLoading(false);
-            // User might have closed the popup without completing auth
-            console.log('Auth popup was closed');
           }
         }
       }, 1000);
@@ -107,7 +123,7 @@ export default function PlaylistCreator({
     }
   };
 
-  const createPlaylist = async () => {
+  const handleCreatePlaylist = async () => {
     if (!isAuthenticated || !accessToken) {
       alert('Please authenticate with YouTube first');
       return;
@@ -118,8 +134,22 @@ export default function PlaylistCreator({
       return;
     }
 
+    // Check if playlist already exists
+    const playlistExists = await checkExistingPlaylist();
+    
+    if (playlistExists) {
+      setShowExistingPlaylistDialog(true);
+      return;
+    }
+
+    // If no existing playlist, proceed with creation
+    createPlaylist(playlistTitle, 'create');
+  };
+
+  const createPlaylist = async (title: string, action: 'create' | 'overwrite' | 'update') => {
     setIsCreating(true);
     setResult(null);
+    setShowExistingPlaylistDialog(false);
 
     try {
       const response = await fetch('/api/playlist', {
@@ -130,7 +160,8 @@ export default function PlaylistCreator({
         body: JSON.stringify({
           tracks: tracks,
           accessToken,
-          playlistTitle,
+          playlistTitle: title,
+          action: action,
         }),
       });
 
@@ -155,9 +186,29 @@ export default function PlaylistCreator({
     }
   };
 
+  const handleExistingPlaylistChoice = () => {
+    let finalPlaylistTitle = playlistTitle;
+    let action: 'create' | 'overwrite' | 'update' = 'create';
+
+    switch (existingPlaylistAction) {
+      case 'overwrite':
+        action = 'overwrite';
+        break;
+      case 'update':
+        action = 'update';
+        break;
+      case 'new_name':
+        finalPlaylistTitle = customPlaylistName || `${playlistTitle} ${new Date().toLocaleDateString()}`;
+        action = 'create';
+        break;
+    }
+setPlaylistTitle(finalPlaylistTitle);
+    createPlaylist(playlistTitle, action);
+  };
+
   const handleRetry = () => {
     setResult(null);
-    createPlaylist();
+    handleCreatePlaylist();
   };
 
   return (
@@ -165,20 +216,6 @@ export default function PlaylistCreator({
       <h2 className="text-xl font-semibold mb-4">Create YouTube Playlist</h2>
       
       <div className="space-y-4">
-        <div>
-          <label htmlFor="playlist-title" className="block text-sm font-medium text-gray-700 mb-2">
-            Playlist Title
-          </label>
-          <input
-            id="playlist-title"
-            type="text"
-            value={playlistTitle}
-            onChange={(e) => setPlaylistTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter playlist title"
-          />
-        </div>
-
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-medium mb-2">Track Summary</h3>
           <p className="text-sm text-gray-600">
@@ -232,7 +269,7 @@ export default function PlaylistCreator({
               Connected to YouTube
             </div>
             <button
-              onClick={createPlaylist}
+              onClick={handleCreatePlaylist}
               disabled={isCreating}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
@@ -248,6 +285,95 @@ export default function PlaylistCreator({
                 'Create YouTube Playlist'
               )}
             </button>
+            <p className="text-xs text-gray-500 text-center">
+              Playlist will be created as: <strong>My Shazam Tracks</strong>
+            </p>
+          </div>
+        )}
+
+        {/* Existing Playlist Dialog */}
+        {showExistingPlaylistDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h3 className="text-lg font-semibold mb-4">Playlist Already Exists</h3>
+              <p className="text-gray-600 mb-4">
+                A playlist named <strong>&quot;My Shazam Tracks&quot;</strong> already exists. What would you like to do?
+              </p>
+              
+              <div className="space-y-3 mb-4">
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    name="existingPlaylistAction"
+                    value="overwrite"
+                    checked={existingPlaylistAction === 'overwrite'}
+                    onChange={(e) => setExistingPlaylistAction(e.target.value as ExistingPlaylistAction)}
+                    className="text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">
+                    <strong>Overwrite</strong> - Replace all content with new tracks
+                  </span>
+                </label>
+                
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    name="existingPlaylistAction"
+                    value="update"
+                    checked={existingPlaylistAction === 'update'}
+                    onChange={(e) => setExistingPlaylistAction(e.target.value as ExistingPlaylistAction)}
+                    className="text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">
+                    <strong>Update</strong> - Add only new tracks to existing playlist
+                  </span>
+                </label>
+                
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    name="existingPlaylistAction"
+                    value="new_name"
+                    checked={existingPlaylistAction === 'new_name'}
+                    onChange={(e) => setExistingPlaylistAction(e.target.value as ExistingPlaylistAction)}
+                    className="text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm">
+                    <strong>Use different name</strong> - Create a new playlist
+                  </span>
+                </label>
+              </div>
+
+              {existingPlaylistAction === 'new_name' && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Playlist Name
+                  </label>
+                  <input
+                    type="text"
+                    value={customPlaylistName}
+                    onChange={(e) => setCustomPlaylistName(e.target.value)}
+                    placeholder="Enter new playlist name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowExistingPlaylistDialog(false)}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleExistingPlaylistChoice}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -261,7 +387,9 @@ export default function PlaylistCreator({
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Playlist Created Successfully!
+                  {result.action === 'created' && 'Playlist Created Successfully!'}
+                  {result.action === 'replaced' && 'Playlist Updated Successfully!'}
+                  {result.action === 'updated' && 'Playlist Enhanced Successfully!'}
                 </>
               ) : (
                 <>
