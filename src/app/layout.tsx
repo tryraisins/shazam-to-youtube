@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google"; // Import Inter
 import "./globals.css";
 import AnimatedBackground from "../components/AnimatedBackground";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Setup Inter font
+const inter = Inter({
+  variable: "--font-sans", // Use a standard CSS variable name
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Shazam to YouTube",
+  title: "EchoList",
   description: "Transform your Shazam discoveries into YouTube playlists in seconds",
 };
 
@@ -25,8 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* Apply the font variable to the body */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+        className={`${inter.variable} font-sans antialiased`}
       >
         <AnimatedBackground />
         <div className="relative z-10">

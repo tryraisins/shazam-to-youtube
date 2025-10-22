@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ShazamTrack } from '@/lib/csv-parser';
+import { Check, Loader2, AlertTriangle, XCircle, PartyPopper } from 'lucide-react'; // Import new icons
 
 interface PlaylistCreationResult {
   success: boolean;
@@ -38,7 +39,7 @@ export default function PlaylistCreator({
   const [existingPlaylistAction, setExistingPlaylistAction] = useState<ExistingPlaylistAction>('overwrite');
   const [customPlaylistName, setCustomPlaylistName] = useState('');
 
-  // Handle OAuth callback from popup
+    // Handle OAuth callback from popup
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
@@ -212,23 +213,23 @@ setPlaylistTitle(finalPlaylistTitle);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Create YouTube Playlist</h2>
-      
-      <div className="space-y-4">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-medium mb-2">Track Summary</h3>
-          <p className="text-sm text-gray-600">
+    // No bg-white, shadow-md, or p-6.
+    <div className="w-full">
+      <div className="space-y-6">
+        {/* Dark-themed track summary */}
+        <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+          <h3 className="font-medium text-gray-100 mb-2">Track Summary</h3>
+          <p className="text-sm text-gray-400">
             Found {tracks.length} tracks in your Shazam history
           </p>
-          <div className="mt-2 max-h-40 overflow-y-auto">
+          <div className="mt-2 max-h-40 overflow-y-auto rounded-md">
             {tracks.slice(0, 10).map((track, index) => (
-              <div key={`${track.artist}-${track.title}-${index}`} className="text-xs text-gray-500 py-1 border-b border-gray-200">
-                <span className="font-medium">{track.artist}</span> - {track.title}
+              <div key={`${track.artist}-${track.title}-${index}`} className="text-xs text-gray-400 py-1.5 px-2 border-b border-white/5">
+                <span className="font-medium text-gray-300">{track.artist}</span> - {track.title}
               </div>
             ))}
             {tracks.length > 10 && (
-              <div className="text-xs text-gray-400 py-1">
+              <div className="text-xs text-gray-500 py-1.5 px-2">
                 ... and {tracks.length - 10} more tracks
               </div>
             )}
@@ -240,105 +241,99 @@ setPlaylistTitle(finalPlaylistTitle);
             <button
               onClick={authenticateWithYouTube}
               disabled={authLoading}
-              className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              className="w-full flex items-center justify-center bg-red-600 text-white py-2.5 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
               {authLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                <>
+                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5" />
                   Opening YouTube...
-                </span>
+                </>
               ) : (
                 'Connect YouTube Account'
               )}
             </button>
             {authLoading && (
               <p className="text-xs text-gray-500 text-center">
-                A new window will open for YouTube authentication
+                A new window will open for authentication
               </p>
             )}
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="flex items-center text-sm text-green-600 mb-2">
-              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
+            <div className="flex items-center justify-center text-sm text-green-400 mb-2 p-2 bg-green-500/10 rounded-md">
+              <Check className="w-4 h-4 mr-2" />
               Connected to YouTube
             </div>
+            {/* --- PRIMARY ACTION BUTTON (GRADIENT) --- */}
             <button
               onClick={handleCreatePlaylist}
               disabled={isCreating}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              className="w-full flex items-center justify-center bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-white font-semibold py-2.5 px-4 rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200"
             >
               {isCreating ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                <>
+                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5" />
                   Creating Playlist...
-                </span>
+                </>
               ) : (
                 'Create YouTube Playlist'
               )}
             </button>
             <p className="text-xs text-gray-500 text-center">
-              Playlist will be created as: <strong>My Shazam Tracks</strong>
+              Playlist will be created as: <strong className="text-gray-400">My Shazam Tracks</strong>
             </p>
           </div>
         )}
 
-        {/* Existing Playlist Dialog */}
+        {/* --- DARK/GLASS MODAL --- */}
         {showExistingPlaylistDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h3 className="text-lg font-semibold mb-4">Playlist Already Exists</h3>
-              <p className="text-gray-600 mb-4">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6 border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">Playlist Already Exists</h3>
+              <p className="text-gray-400 mb-4">
                 A playlist named <strong>&quot;My Shazam Tracks&quot;</strong> already exists. What would you like to do?
               </p>
               
               <div className="space-y-3 mb-4">
-                <label className="flex items-center space-x-3">
+                {/* Styled Radio Buttons */}
+                <label className="flex items-center space-x-3 p-3 rounded-md bg-white/5 hover:bg-white/10 cursor-pointer">
                   <input
                     type="radio"
                     name="existingPlaylistAction"
                     value="overwrite"
                     checked={existingPlaylistAction === 'overwrite'}
                     onChange={(e) => setExistingPlaylistAction(e.target.value as ExistingPlaylistAction)}
-                    className="text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 text-blue-400 bg-gray-700 border-gray-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm">
+                  <span className="text-sm text-gray-200">
                     <strong>Overwrite</strong> - Replace all content with new tracks
                   </span>
                 </label>
                 
-                <label className="flex items-center space-x-3">
+                <label className="flex items-center space-x-3 p-3 rounded-md bg-white/5 hover:bg-white/10 cursor-pointer">
                   <input
                     type="radio"
                     name="existingPlaylistAction"
                     value="update"
                     checked={existingPlaylistAction === 'update'}
                     onChange={(e) => setExistingPlaylistAction(e.target.value as ExistingPlaylistAction)}
-                    className="text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 text-blue-400 bg-gray-700 border-gray-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm">
+                  <span className="text-sm text-gray-200">
                     <strong>Update</strong> - Add only new tracks to existing playlist
                   </span>
                 </label>
                 
-                <label className="flex items-center space-x-3">
+                <label className="flex items-center space-x-3 p-3 rounded-md bg-white/5 hover:bg-white/10 cursor-pointer">
                   <input
                     type="radio"
                     name="existingPlaylistAction"
                     value="new_name"
                     checked={existingPlaylistAction === 'new_name'}
                     onChange={(e) => setExistingPlaylistAction(e.target.value as ExistingPlaylistAction)}
-                    className="text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 text-blue-400 bg-gray-700 border-gray-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm">
+                  <span className="text-sm text-gray-200">
                     <strong>Use different name</strong> - Create a new playlist
                   </span>
                 </label>
@@ -346,15 +341,16 @@ setPlaylistTitle(finalPlaylistTitle);
 
               {existingPlaylistAction === 'new_name' && (
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     New Playlist Name
                   </label>
+                  {/* Dark-themed Input */}
                   <input
                     type="text"
                     value={customPlaylistName}
                     onChange={(e) => setCustomPlaylistName(e.target.value)}
-                    placeholder="Enter new playlist name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., My Shazam Vibes"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -362,7 +358,7 @@ setPlaylistTitle(finalPlaylistTitle);
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowExistingPlaylistDialog(false)}
-                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="flex-1 px-4 py-2 text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   Cancel
                 </button>
@@ -377,39 +373,37 @@ setPlaylistTitle(finalPlaylistTitle);
           </div>
         )}
 
+        {/* --- DARK-THEMED RESULT --- */}
         {result && (
           <div className={`p-4 rounded-md ${
-            result.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+            result.success ? 'bg-green-500/10 text-green-300' : 'bg-red-500/10 text-red-300'
           }`}>
             <h4 className="font-medium flex items-center">
               {result.success ? (
                 <>
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+                  <PartyPopper className="w-5 h-5 mr-2" />
                   {result.action === 'created' && 'Playlist Created Successfully!'}
                   {result.action === 'replaced' && 'Playlist Updated Successfully!'}
                   {result.action === 'updated' && 'Playlist Enhanced Successfully!'}
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
+                  <XCircle className="w-5 h-5 mr-2" />
                   Creation Failed
                 </>
               )}
             </h4>
             {result.success ? (
               <div className="text-sm mt-2 space-y-1">
-                <p>Added {result.addedTracks} out of {result.totalTracks} tracks to your playlist.</p>
+                <p>Added {result.addedTracks} out of {result.totalTracks} tracks.</p>
                 {result.failedTracks > 0 && (
-                  <p className="text-yellow-700">
+                  <p className="text-yellow-400/80 flex items-center">
+                    <AlertTriangle className="w-4 h-4 mr-1.5 flex-shrink-0" />
                     {result.failedTracks} tracks couldn&apos;t be found on YouTube.
                   </p>
                 )}
                 {result.playlistId && (
-                  <p className="text-xs opacity-75">
+                  <p className="text-xs text-gray-500 mt-2">
                     Playlist ID: {result.playlistId}
                   </p>
                 )}
@@ -419,7 +413,7 @@ setPlaylistTitle(finalPlaylistTitle);
                 <p>{result.error}</p>
                 <button
                   onClick={handleRetry}
-                  className="mt-2 bg-red-600 text-white py-1 px-3 rounded text-xs hover:bg-red-700"
+                  className="mt-2 bg-red-600 text-white py-1 px-3 rounded text-xs hover:bg-red-700 font-medium"
                 >
                   Try Again
                 </button>

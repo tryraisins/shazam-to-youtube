@@ -29,11 +29,13 @@ export default function Home() {
               </div>
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
-              Shazam to YouTube
+            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+              <span className="bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
+                EchoList
+              </span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Transform your Shazam discoveries into YouTube playlists in seconds
+             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed font-light">
+              Seamlessly convert your <span className="text-blue-300 font-medium">Shazam discoveries</span> into curated <span className="text-red-300 font-medium">YouTube playlists</span>
             </p>
           </div>
 
@@ -67,7 +69,7 @@ export default function Home() {
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold">2</span>
               Upload Your CSV File
             </h2>
-            <FileUpload onTracksParsed={setTracks} />
+            <FileUpload onTracksParsed={setTracks} onParsingStateChange={() => {}} />
           </div>
 
           {/* Playlist Creator */}
