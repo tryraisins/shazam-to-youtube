@@ -50,15 +50,26 @@ export default function Home() {
                 </p>
               </div>
                
-
-               <button
-  onClick={() => window.location.href = '/redirects/shazam'}
+<a
+  href="https://shazam.com/myshazam"
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={(e) => {
+    e.preventDefault();
+    // Force browser context with multiple techniques
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      // Small delay to ensure window opens before navigation
+      setTimeout(() => {
+        newWindow.location.href = 'https://shazam.com/myshazam?forceBrowser=1&ref=web&noapp=1';
+      }, 100);
+    }
+  }}
   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
 >
   Export from Shazam
   <ExternalLink className="w-5 h-5" />
-</button>
-
+</a>
 
             </div>
           </div>
