@@ -50,9 +50,9 @@ export default function Home() {
                 </p>
               </div>
               <a
-                href="shazam.com/myshazam"
+                href="www.shazam.com/myshazam"
                 target="_blank"
-                rel="noopener noreferrer"
+                // rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
               >
                 Export from Shazam
