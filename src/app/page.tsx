@@ -28,7 +28,7 @@ export default function Home() {
                 <Youtube className="w-10 h-10 text-white" />
               </div>
             </div>
-            
+
             <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
               Shazam to YouTube
             </h1>
@@ -50,10 +50,14 @@ export default function Home() {
                 </p>
               </div>
               <a
-                href="https://www.shazam.com/myshazam"
+                href="https://www.shazam.com/myshazam?ref=web"
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open('https://www.shazam.com/myshazam?ref=web&forceBrowser=true', '_blank', 'noopener,noreferrer');
+                }}
               >
                 Export from Shazam
                 <ExternalLink className="w-5 h-5" />
