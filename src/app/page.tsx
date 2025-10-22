@@ -51,18 +51,29 @@ export default function Home() {
               </div>
                
 <a
-  href="https://shazam.com/myshazam"
+  href="https://myshazam.shazam.com"
   target="_blank"
   rel="noopener noreferrer"
   onClick={(e) => {
     e.preventDefault();
-    // Force browser context with multiple techniques
+    // Try multiple URL variations
+    const urls = [
+      'https://myshazam.shazam.com',
+      'https://shazam.com/myshazam?noredirect=1',
+      'https://www.shazam.com/myshazam'
+    ];
+    
     const newWindow = window.open('', '_blank');
     if (newWindow) {
-      // Small delay to ensure window opens before navigation
-      setTimeout(() => {
-        newWindow.location.href = 'https://shazam.com/myshazam?forceBrowser=1&ref=web&noapp=1';
-      }, 100);
+      // Try different URLs until one works
+      let currentIndex = 0;
+      const tryUrl = () => {
+        if (currentIndex < urls.length) {
+          newWindow.location.href = urls[currentIndex];
+          currentIndex++;
+        }
+      };
+      tryUrl();
     }
   }}
   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
