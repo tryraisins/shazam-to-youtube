@@ -49,19 +49,17 @@ export default function Home() {
                   Visit Shazam to download your music history as a CSV file
                 </p>
               </div>
-              <a
-                href="https://www.shazam.com/myshazam?ref=web"
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.open('https://www.shazam.com/myshazam?ref=web&forceBrowser=true', '_blank', 'noopener,noreferrer');
-                }}
-              >
-                Export from Shazam
-                <ExternalLink className="w-5 h-5" />
-              </a>
+               
+
+               <button
+  onClick={() => window.location.href = '/redirects/shazam'}
+  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
+>
+  Export from Shazam
+  <ExternalLink className="w-5 h-5" />
+</button>
+
+
             </div>
           </div>
 
