@@ -28,7 +28,7 @@ export default function Home() {
                 <Youtube className="w-10 h-10 text-white" />
               </div>
             </div>
-
+            
             <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
               Shazam to YouTube
             </h1>
@@ -49,39 +49,15 @@ export default function Home() {
                   Visit Shazam to download your music history as a CSV file
                 </p>
               </div>
-               
-<a
-  href="https://myshazam.shazam.com"
-  target="_blank"
-  rel="noopener noreferrer"
-  onClick={(e) => {
-    e.preventDefault();
-    // Try multiple URL variations
-    const urls = [
-      'https://myshazam.shazam.com',
-      'https://shazam.com/myshazam?noredirect=1',
-      'https://www.shazam.com/myshazam'
-    ];
-    
-    const newWindow = window.open('', '_blank');
-    if (newWindow) {
-      // Try different URLs until one works
-      let currentIndex = 0;
-      const tryUrl = () => {
-        if (currentIndex < urls.length) {
-          newWindow.location.href = urls[currentIndex];
-          currentIndex++;
-        }
-      };
-      tryUrl();
-    }
-  }}
-  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
->
-  Export from Shazam
-  <ExternalLink className="w-5 h-5" />
-</a>
-
+              <a
+                href="shazam.com/myshazam"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
+              >
+                Export from Shazam
+                <ExternalLink className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
