@@ -1,126 +1,298 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import FileUpload from '@/components/FileUpload';
 import PlaylistCreator from '@/components/PlaylistCreator';
 import { ShazamTrack } from '@/lib/csv-parser';
-import { ExternalLink, Music2, Youtube } from 'lucide-react';
+import {
+  ArrowTopRightOnSquareIcon,
+  MusicalNoteIcon,
+  PlayCircleIcon,
+  SparklesIcon,
+  ArrowDownIcon,
+} from '@heroicons/react/24/outline';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register GSAP plugins
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Home() {
   const [tracks, setTracks] = useState<ShazamTrack[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessToken, setAccessToken] = useState<string>('');
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const stepsRef = useRef<HTMLDivElement>(null);
+
+  // Hero entrance animations
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Staggered title animation
+      gsap.fromTo(
+        titleRef.current,
+        { opacity: 0, y: 60, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power4.out', delay: 0.3 }
+      );
+
+      gsap.fromTo(
+        subtitleRef.current,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.6 }
+      );
+
+      // Floating animation for hero icons
+      gsap.to('.hero-icon', {
+        y: -15,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        stagger: 0.3,
+      });
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Steps scroll animation
+  useEffect(() => {
+    if (stepsRef.current) {
+      const cards = stepsRef.current.querySelectorAll('.step-card');
+
+      cards.forEach((card, index) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+            delay: index * 0.1,
+          }
+        );
+      });
+    }
+  }, []);
+
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-12 animate-slide-up">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-2xl animate-glow transform hover:scale-110 transition-transform duration-300">
-                <Music2 className="w-10 h-10 text-white" />
-              </div>
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                →
-              </div>
-              <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-2xl animate-glow transform hover:scale-110 transition-transform duration-300" style={{ animationDelay: '1.5s' }}>
-                <Youtube className="w-10 h-10 text-white" />
-              </div>
+    <div className="min-h-screen relative overflow-hidden px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="max-w-5xl mx-auto">
+        {/* Hero Section */}
+        <section ref={heroRef} className="text-center py-16 md:py-24">
+          {/* Floating music icons decoration */}
+          <div className="flex items-center justify-center gap-6 mb-8">
+            <div className="hero-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-coral-500 to-coral-600 flex items-center justify-center shadow-neon-coral rotate-[-8deg]">
+              <MusicalNoteIcon className="w-7 h-7 text-white" />
             </div>
-            
-            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
-              <span className="bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
-                EchoList
-              </span>
-            </h1>
-             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed font-light">
-              Seamlessly convert your <span className="text-blue-300 font-medium">Shazam discoveries</span> into curated <span className="text-red-300 font-medium">YouTube playlists</span>
-            </p>
-          </div>
 
-          {/* Export Button Card */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50 p-6 mb-8 animate-slide-up hover:bg-gray-800/70 transition-all duration-300" style={{ animationDelay: '0.2s' }}>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-center sm:text-left">
-                <h2 className="text-xl font-semibold text-white mb-2 flex items-center gap-2 justify-center sm:justify-start">
-                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 text-sm font-bold">1</span>
-                  Export Your Shazam Data
-                </h2>
-                <p className="text-gray-400">
-                  Visit Shazam to download your music history as a CSV file
-                </p>
-              </div>
-              <a
-                href="https://www.shazam.com/myshazam"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105"
-              >
-                Export from Shazam
-                <ExternalLink className="w-5 h-5" />
-              </a>
+            <div className="hero-icon flex items-center justify-center" style={{ animationDelay: '0.2s' }}>
+              <div className="w-20 h-20 rounded-full vinyl-record animate-spin-slow opacity-80" />
+            </div>
+
+            <div className="hero-icon w-14 h-14 rounded-2xl bg-gradient-to-br from-ocean-500 to-ocean-600 flex items-center justify-center shadow-neon-ocean rotate-[8deg]">
+              <PlayCircleIcon className="w-7 h-7 text-white" />
             </div>
           </div>
 
-          {/* Upload Section */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50 p-8 mb-8 animate-slide-up hover:bg-gray-800/70 transition-all duration-300" style={{ animationDelay: '0.4s' }}>
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 text-sm font-bold">2</span>
-              Upload Your CSV File
-            </h2>
-            <FileUpload onTracksParsed={setTracks} onParsingStateChange={() => {}} />
+          {/* Main title */}
+          <h1
+            ref={titleRef}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6 opacity-0"
+            style={{ fontFamily: "'Clash Display', sans-serif" }}
+          >
+            <span className="gradient-text">EchoList</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p
+            ref={subtitleRef}
+            className="text-lg sm:text-xl md:text-2xl text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed opacity-0"
+          >
+            Transform your{' '}
+            <span className="font-semibold text-coral-500">Shazam discoveries</span>{' '}
+            into curated{' '}
+            <span className="font-semibold text-ocean-500">YouTube playlists</span>{' '}
+            in seconds
+          </p>
+
+
+        </section>
+
+        {/* Steps Section */}
+        <section ref={stepsRef} className="space-y-8" id="how-it-works">
+          {/* Step 1: Export from Shazam */}
+          <div className="step-card glass-card p-6 sm:p-8 relative overflow-hidden">
+            {/* Decorative gradient */}
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                background: 'radial-gradient(circle at 0% 0%, rgba(255, 107, 69, 0.4) 0%, transparent 50%)',
+              }}
+            />
+
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  {/* Step number */}
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-coral-500 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-neon-coral">
+                    <span
+                      className="text-xl font-bold text-white"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      1
+                    </span>
+                  </div>
+
+                  <div>
+                    <h2
+                      className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      Export Your Shazam Data
+                    </h2>
+                    <p className="text-[var(--text-secondary)]">
+                      Visit Shazam to download your music discovery history as a CSV file
+                    </p>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <a
+                  href="https://www.shazam.com/myshazam"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-gradient-to-r from-coral-600 to-amber-600 text-white font-bold shadow-neon-coral hover:opacity-90 transition-all duration-300 cursor-pointer group"
+                >
+                  Export from Shazam
+                  <ArrowTopRightOnSquareIcon className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+              </div>
+
+              {/* Decorative wave bars */}
+              <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:flex gap-1 items-end h-16 opacity-20">
+                {[40, 65, 35, 80, 50, 70, 45].map((height, i) => (
+                  <div
+                    key={i}
+                    className="wave-bar w-2 animate-equalizer"
+                    style={{
+                      height: `${height}%`,
+                      animationDelay: `${i * 0.1}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Playlist Creator */}
+          {/* Step 2: Upload CSV */}
+          <div className="step-card glass-card p-6 sm:p-8 relative overflow-hidden">
+            {/* Decorative gradient */}
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                background: 'radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.4) 0%, transparent 50%)',
+              }}
+            />
+
+            <div className="relative z-10">
+              <div className="flex items-start gap-4 mb-6">
+                {/* Step number */}
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-neon-amber">
+                  <span
+                    className="text-xl font-bold text-white"
+                    style={{ fontFamily: "'Clash Display', sans-serif" }}
+                  >
+                    2
+                  </span>
+                </div>
+
+                <div>
+                  <h2
+                    className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2"
+                    style={{ fontFamily: "'Clash Display', sans-serif" }}
+                  >
+                    Upload Your CSV File
+                  </h2>
+                  <p className="text-[var(--text-secondary)]">
+                    Drag and drop or click to select your exported Shazam data
+                  </p>
+                </div>
+              </div>
+
+              <FileUpload onTracksParsed={setTracks} onParsingStateChange={() => { }} />
+            </div>
+          </div>
+
+          {/* Step 3: Create Playlist (only shows when tracks are loaded) */}
           {tracks.length > 0 && (
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50 p-8 animate-slide-up hover:bg-gray-800/70 transition-all duration-300">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-pink-500/20 text-pink-400 text-sm font-bold">3</span>
-                Create Your Playlist
-              </h2>
-              <PlaylistCreator
-                tracks={tracks}
-                isAuthenticated={isAuthenticated}
-                accessToken={accessToken}
-                onAuthChange={setIsAuthenticated}
-                onTokenChange={setAccessToken}
+            <div className="step-card glass-card p-6 sm:p-8 relative overflow-hidden">
+              {/* Decorative gradient */}
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  background: 'radial-gradient(circle at 50% 100%, rgba(20, 184, 166, 0.4) 0%, transparent 50%)',
+                }}
               />
+
+              <div className="relative z-10">
+                <div className="flex items-start gap-4 mb-6">
+                  {/* Step number */}
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-ocean-500 to-ocean-600 flex items-center justify-center flex-shrink-0 shadow-neon-ocean">
+                    <span
+                      className="text-xl font-bold text-white"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      3
+                    </span>
+                  </div>
+
+                  <div>
+                    <h2
+                      className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      Create Your Playlist
+                    </h2>
+                    <p className="text-[var(--text-secondary)]">
+                      Connect to YouTube and generate your personalized playlist
+                    </p>
+                  </div>
+                </div>
+
+                <PlaylistCreator
+                  tracks={tracks}
+                  isAuthenticated={isAuthenticated}
+                  accessToken={accessToken}
+                  onAuthChange={setIsAuthenticated}
+                  onTokenChange={setAccessToken}
+                />
+              </div>
             </div>
           )}
+        </section>
 
-          {/* Footer */}
-          <div className="text-center mt-12 text-gray-500 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-            <p className="flex items-center justify-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              Your data stays private and is processed locally in your browser
-            </p>
+        {/* Footer */}
+        <footer className="mt-16 text-center">
+          <div className="glass-card inline-flex items-center gap-3 px-6 py-3 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-ocean-500 animate-pulse" />
+            <span className="text-sm text-[var(--text-muted)]">
+              Your data stays private — processed locally in your browser
+            </span>
+            <SparklesIcon className="w-4 h-4 text-amber-500" />
           </div>
-        </div>
+        </footer>
       </div>
-
-      <style jsx>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slide-up {
-          animation: slideUp 0.6s ease-out forwards;
-        }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-          50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8), 0 0 40px rgba(147, 51, 234, 0.5); }
-        }
-        .animate-glow {
-          animation: glow 3s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

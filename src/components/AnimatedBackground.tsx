@@ -1,278 +1,255 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Music2, Radio, Mic, Headphones, Disc, Volume2, Music, Smartphone } from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { useTheme } from './ThemeProvider';
 
-// Types for animated background components
-interface MusicIcon {
+interface FloatingElement {
   id: number;
-  Icon: LucideIcon;
-  color: string;
+  type: 'vinyl' | 'wave' | 'note' | 'eq';
+  x: number;
+  y: number;
   size: number;
-  top: number;
-  left: number;
   delay: number;
   duration: number;
-  opacity: number;
-  animationType: string;
+  rotation: number;
 }
 
-interface WaveCircle {
-  id: number;
-  color: string;
-  size: number;
-  top: number;
-  left: number;
-  delay: number;
-}
+// Musical note SVG paths
+const NotePath = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+  </svg>
+);
 
-interface Equalizer {
-  id: number;
-  bars: number;
-  top: number;
-  left: number;
-  barColors: string[];
-  delays: number[];
-}
+const DoubleNotePath = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <path d="M21 3v12.5a3.5 3.5 0 0 1-7 0 3.5 3.5 0 0 1 3.5-3.5c.54 0 1.05.12 1.5.34V6.47L9 8.6v8.9A3.5 3.5 0 0 1 5.5 21 3.5 3.5 0 0 1 2 17.5 3.5 3.5 0 0 1 5.5 14c.54 0 1.05.12 1.5.34V6l14-3z" />
+  </svg>
+);
 
 export default function AnimatedBackground() {
-  const [musicIcons, setMusicIcons] = useState<MusicIcon[]>([]);
-  const [waveCircles, setWaveCircles] = useState<WaveCircle[]>([]);
-  const [equalizers, setEqualizers] = useState<Equalizer[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [elements, setElements] = useState<FloatingElement[]>([]);
+  const { theme } = useTheme();
 
-  const icons: LucideIcon[] = [Music2, Radio, Mic, Headphones, Disc, Volume2, Music, Smartphone];
-  const colors: string[] = ['blue', 'purple', 'pink', 'cyan', 'indigo', 'violet', 'fuchsia'];
-
-  // Helper function to get color RGB values
-  const getColorRGB = (color: string): string => {
-    const colorMap: Record<string, string> = {
-      blue: 'rgba(59, 130, 246, 0.1)',
-      purple: 'rgba(147, 51, 234, 0.1)',
-      pink: 'rgba(236, 72, 153, 0.1)',
-      cyan: 'rgba(34, 211, 238, 0.1)',
-      indigo: 'rgba(99, 102, 241, 0.1)',
-      violet: 'rgba(139, 92, 246, 0.1)',
-      fuchsia: 'rgba(217, 70, 239, 0.1)'
-    };
-    return colorMap[color] || colorMap.blue;
-  };
-
-  const getEqualizerColor = (color: string): string => {
-    const colorMap: Record<string, string> = {
-      blue: 'rgba(96, 165, 250, 0.25)',
-      purple: 'rgba(168, 85, 247, 0.25)',
-      pink: 'rgba(244, 114, 182, 0.25)',
-      cyan: 'rgba(103, 232, 249, 0.25)',
-      indigo: 'rgba(129, 140, 248, 0.25)',
-      violet: 'rgba(167, 139, 250, 0.25)',
-      fuchsia: 'rgba(232, 121, 249, 0.25)'
-    };
-    return colorMap[color] || colorMap.blue;
-  };
-
-  const getIconColor = (color: string): string => {
-    const colorMap: Record<string, string> = {
-      blue: '#60a5fa',
-      purple: '#a855f7',
-      pink: '#f472b6',
-      cyan: '#67e8f9',
-      indigo: '#818cf8',
-      violet: '#a78bfa',
-      fuchsia: '#e879f9'
-    };
-    return colorMap[color] || colorMap.blue;
-  };
-
+  // Generate floating elements on mount
   useEffect(() => {
-    // Generate 40 random music icons
-    const generatedIcons: MusicIcon[] = Array.from({ length: 40 }, (_, i) => {
-      const Icon = icons[Math.floor(Math.random() * icons.length)];
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const size = Math.floor(Math.random() * 4) + 6; // 6-9 (w-6 to w-9)
-      const top = Math.random() * 95; // 0-95%
-      const left = Math.random() * 95; // 0-95%
-      const delay = Math.random() * 4; // 0-4s
-      const duration = Math.random() * 3 + 5; // 5-8s
-      const opacity = Math.floor(Math.random() * 2) + 3; // 30-40
-      const animationType = Math.random() > 0.5 ? 'float' : 'float-delayed';
+    const types: FloatingElement['type'][] = ['vinyl', 'wave', 'note', 'eq'];
+    const generated: FloatingElement[] = [];
 
-      return {
-        id: i,
-        Icon,
-        color,
-        size,
-        top,
-        left,
-        delay,
-        duration,
-        opacity,
-        animationType
-      };
-    });
-    setMusicIcons(generatedIcons);
+    // Generate vinyl records (larger, fewer)
+    for (let i = 0; i < 3; i++) {
+      generated.push({
+        id: generated.length,
+        type: 'vinyl',
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 120 + Math.random() * 80,
+        delay: Math.random() * 2,
+        duration: 15 + Math.random() * 10,
+        rotation: Math.random() * 360,
+      });
+    }
 
-    // Generate 12 wave circles
-    const generatedCircles: WaveCircle[] = Array.from({ length: 12 }, (_, i) => {
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const size = Math.floor(Math.random() * 200) + 200; // 200-400px
-      const top = Math.random() * 90; // 0-90%
-      const left = Math.random() * 90; // 0-90%
-      const delay = Math.random() * 3; // 0-3s
+    // Generate wave circles
+    for (let i = 0; i < 6; i++) {
+      generated.push({
+        id: generated.length,
+        type: 'wave',
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 200 + Math.random() * 200,
+        delay: Math.random() * 3,
+        duration: 4 + Math.random() * 2,
+        rotation: 0,
+      });
+    }
 
-      return {
-        id: i,
-        color,
-        size,
-        top,
-        left,
-        delay
-      };
-    });
-    setWaveCircles(generatedCircles);
+    // Generate musical notes
+    for (let i = 0; i < 15; i++) {
+      generated.push({
+        id: generated.length,
+        type: 'note',
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 24 + Math.random() * 32,
+        delay: Math.random() * 4,
+        duration: 8 + Math.random() * 6,
+        rotation: -20 + Math.random() * 40,
+      });
+    }
 
-    // Generate 8 equalizer sets
-    const generatedEqualizers: Equalizer[] = Array.from({ length: 8 }, (_, i) => {
-      const bars = Math.floor(Math.random() * 3) + 3; // 3-5 bars
-      const top = Math.random() * 90; // 0-90%
-      const left = Math.random() * 90; // 0-90%
-      const barColors = Array.from({ length: bars }, () => 
-        colors[Math.floor(Math.random() * colors.length)]
-      );
-      const delays = Array.from({ length: bars }, () => Math.random() * 0.5);
+    // Generate equalizer sets
+    for (let i = 0; i < 5; i++) {
+      generated.push({
+        id: generated.length,
+        type: 'eq',
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 60 + Math.random() * 40,
+        delay: Math.random() * 2,
+        duration: 0.8 + Math.random() * 0.4,
+        rotation: 0,
+      });
+    }
 
-      return {
-        id: i,
-        bars,
-        top,
-        left,
-        barColors,
-        delays
-      };
-    });
-    setEqualizers(generatedEqualizers);
+    setElements(generated);
   }, []);
 
+  // GSAP animations
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Animate blobs
+      gsap.to('.blob', {
+        x: 'random(-100, 100)',
+        y: 'random(-100, 100)',
+        duration: 20,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        stagger: {
+          each: 2,
+          from: 'random',
+        },
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  const getColorClasses = (type: FloatingElement['type'], index: number) => {
+    const coralOpacity = theme === 'dark' ? 'opacity-20' : 'opacity-15';
+    const oceanOpacity = theme === 'dark' ? 'opacity-15' : 'opacity-12';
+    const amberOpacity = theme === 'dark' ? 'opacity-18' : 'opacity-12';
+
+    const colors = [
+      `text-coral-500 ${coralOpacity}`,
+      `text-ocean-500 ${oceanOpacity}`,
+      `text-amber-500 ${amberOpacity}`,
+    ];
+    return colors[index % colors.length];
+  };
+
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-gray-900">
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { 
-            transform: translate(0, 0) rotate(0deg); 
-            opacity: 0.3; 
-          }
-          25% { 
-            transform: translate(15px, -20px) rotate(10deg); 
-            opacity: 0.5; 
-          }
-          50% { 
-            transform: translate(-10px, -35px) rotate(-8deg); 
-            opacity: 0.6; 
-          }
-          75% { 
-            transform: translate(-20px, -15px) rotate(12deg); 
-            opacity: 0.4; 
-          }
-        }
-        @keyframes float-delayed {
-          0%, 100% { 
-            transform: translate(0, 0) rotate(0deg); 
-            opacity: 0.3; 
-          }
-          25% { 
-            transform: translate(-18px, -25px) rotate(-12deg); 
-            opacity: 0.5; 
-          }
-          50% { 
-            transform: translate(12px, -40px) rotate(10deg); 
-            opacity: 0.7; 
-          }
-          75% { 
-            transform: translate(10px, -20px) rotate(-10deg); 
-            opacity: 0.4; 
-          }
-        }
-        @keyframes equalizer {
-          0%, 100% { transform: scaleY(0.2); }
-          50% { transform: scaleY(1); }
-        }
-        @keyframes pulse-wave {
-          0%, 100% { 
-            transform: scale(1); 
-            opacity: 0.1; 
-          }
-          50% { 
-            transform: scale(1.3); 
-            opacity: 0.2; 
-          }
-        }
-      `}</style>
+    <div
+      ref={containerRef}
+      className="fixed inset-0 overflow-hidden pointer-events-none -z-10"
+    >
+      {/* Abstract gradient blobs */}
+      <div
+        className="blob blob-coral absolute w-[500px] h-[500px] -top-48 -left-48 animate-float"
+        style={{ animationDelay: '0s' }}
+      />
+      <div
+        className="blob blob-ocean absolute w-[600px] h-[600px] top-1/2 -right-72 animate-float-slow"
+        style={{ animationDelay: '2s' }}
+      />
+      <div
+        className="blob blob-amber absolute w-[450px] h-[450px] -bottom-32 left-1/3 animate-float-slower"
+        style={{ animationDelay: '4s' }}
+      />
+      <div
+        className="blob blob-coral absolute w-[350px] h-[350px] top-1/4 right-1/4 animate-float"
+        style={{ animationDelay: '1s' }}
+      />
+      <div
+        className="blob blob-ocean absolute w-[400px] h-[400px] bottom-1/4 -left-32 animate-float-slow"
+        style={{ animationDelay: '3s' }}
+      />
 
-      {/* Wave Circles */}
-      {waveCircles.map((circle) => (
-        <div
-          key={`circle-${circle.id}`}
-          className={`absolute rounded-full blur-3xl`}
-          style={{
-            width: `${circle.size}px`,
-            height: `${circle.size}px`,
-            top: `${circle.top}%`,
-            left: `${circle.left}%`,
-            backgroundColor: getColorRGB(circle.color),
-            animation: `pulse-wave 3s ease-in-out infinite`,
-            animationDelay: `${circle.delay}s`
-          }}
-        />
-      ))}
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: theme === 'dark'
+            ? 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)'
+            : 'linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
 
-      {/* Floating Music Icons */}
-      {musicIcons.map((item) => (
+      {/* Floating elements */}
+      {elements.map((element) => (
         <div
-          key={`icon-${item.id}`}
-          className="absolute"
+          key={element.id}
+          className={`absolute ${getColorClasses(element.type, element.id)}`}
           style={{
-            top: `${item.top}%`,
-            left: `${item.left}%`,
-            animation: `${item.animationType} ${item.duration}s ease-in-out infinite`,
-            animationDelay: `${item.delay}s`
+            top: `${element.y}%`,
+            left: `${element.x}%`,
+            width: element.size,
+            height: element.size,
+            transform: `rotate(${element.rotation}deg)`,
           }}
         >
-          <item.Icon 
-            style={{
-              width: `${item.size * 4}px`,
-              height: `${item.size * 4}px`,
-              opacity: item.opacity / 10,
-              color: getIconColor(item.color)
-            }}
-          />
-        </div>
-      ))}
-
-      {/* Equalizer Bars */}
-      {equalizers.map((eq) => (
-        <div
-          key={`eq-${eq.id}`}
-          className="absolute flex gap-1"
-          style={{
-            top: `${eq.top}%`,
-            left: `${eq.left}%`
-          }}
-        >
-          {Array.from({ length: eq.bars }, (_, i) => (
+          {element.type === 'vinyl' && (
             <div
-              key={i}
-              className={`w-1 rounded-full`}
+              className="w-full h-full vinyl-record animate-spin-slow opacity-30"
               style={{
-                height: '50px',
-                backgroundColor: getEqualizerColor(eq.barColors[i]),
-                animation: 'equalizer 1s ease-in-out infinite',
-                animationDelay: `${eq.delays[i]}s`,
-                transformOrigin: 'bottom'
+                animationDuration: `${element.duration}s`,
+                animationDelay: `${element.delay}s`,
               }}
             />
-          ))}
+          )}
+
+          {element.type === 'wave' && (
+            <div
+              className="w-full h-full rounded-full animate-wave"
+              style={{
+                background: theme === 'dark'
+                  ? 'radial-gradient(circle, rgba(255, 107, 69, 0.1) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 107, 69, 0.08) 0%, transparent 70%)',
+                animationDuration: `${element.duration}s`,
+                animationDelay: `${element.delay}s`,
+              }}
+            />
+          )}
+
+          {element.type === 'note' && (
+            <div
+              className="w-full h-full animate-float"
+              style={{
+                animationDuration: `${element.duration}s`,
+                animationDelay: `${element.delay}s`,
+              }}
+            >
+              {element.id % 2 === 0 ? <NotePath /> : <DoubleNotePath />}
+            </div>
+          )}
+
+          {element.type === 'eq' && (
+            <div className="flex gap-1 items-end h-full">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="wave-bar w-2 animate-equalizer"
+                  style={{
+                    height: '100%',
+                    animationDuration: `${element.duration}s`,
+                    animationDelay: `${element.delay + i * 0.1}s`,
+                    opacity: theme === 'dark' ? 0.3 : 0.2,
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       ))}
+
+      {/* Radial gradient overlay for depth */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: theme === 'dark'
+            ? 'radial-gradient(ellipse at 50% 0%, transparent 0%, rgba(10, 10, 15, 0.8) 100%)'
+            : 'radial-gradient(ellipse at 50% 0%, transparent 0%, rgba(250, 248, 245, 0.6) 100%)',
+        }}
+      />
+
+      {/* Noise overlay */}
+      <div className="noise-overlay" />
     </div>
   );
 }

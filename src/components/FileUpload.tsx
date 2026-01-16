@@ -1,21 +1,51 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { ShazamTrack } from '@/lib/csv-parser';
-import { CheckCircle, UploadCloud, X } from 'lucide-react';
+import {
+  ArrowUpTrayIcon,
+  CheckCircleIcon,
+  XMarkIcon,
+  DocumentTextIcon,
+} from '@heroicons/react/24/outline';
+import gsap from 'gsap';
 
 interface FileUploadProps {
   onTracksParsed: (tracks: ShazamTrack[]) => void;
-  onParsingStateChange: (isParsing: boolean) => void; // New prop
+  onParsingStateChange: (isParsing: boolean) => void;
 }
 
 export default function FileUpload({
   onTracksParsed,
-  onParsingStateChange, // Get new prop
+  onParsingStateChange,
 }: FileUploadProps) {
-  const [isParsing, setIsParsing] = useState(false); // Renamed for clarity
+  const [isParsing, setIsParsing] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
+  const dropzoneRef = useRef<HTMLDivElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+
+  // Animation on mount
+  useEffect(() => {
+    if (dropzoneRef.current && !fileName) {
+      gsap.fromTo(
+        dropzoneRef.current,
+        { scale: 0.95, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.5)' }
+      );
+    }
+  }, [fileName]);
+
+  // Success animation
+  useEffect(() => {
+    if (successRef.current && fileName && !isParsing) {
+      gsap.fromTo(
+        successRef.current,
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: 'elastic.out(1, 0.5)' }
+      );
+    }
+  }, [fileName, isParsing]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -23,13 +53,12 @@ export default function FileUpload({
       if (!file) return;
 
       setIsParsing(true);
-      onParsingStateChange(true); // Notify parent: START
+      onParsingStateChange(true);
       setFileName(file.name);
 
       try {
         const text = await file.text();
 
-        // Send to API for parsing
         const response = await fetch('/api/parse-csv', {
           method: 'POST',
           headers: {
@@ -41,11 +70,9 @@ export default function FileUpload({
         if (response.ok) {
           const { tracks, parsedCount, totalCount } = await response.json();
 
-          // Validate that we got proper track data
           if (Array.isArray(tracks)) {
-            onTracksParsed(tracks); // Send tracks to parent
+            onTracksParsed(tracks);
 
-            // Show parsing stats if available
             if (parsedCount !== undefined && totalCount !== undefined) {
               console.log(
                 `Parsed ${parsedCount} out of ${totalCount} tracks successfully`
@@ -61,15 +88,14 @@ export default function FileUpload({
       } catch (error) {
         console.error('Error processing file:', error);
         alert(
-          `Error processing file: ${
-            error instanceof Error ? error.message : 'Unknown error'
+          `Error processing file: ${error instanceof Error ? error.message : 'Unknown error'
           }. Please make sure it's a valid Shazam CSV export.`
         );
         setFileName(null);
-        onTracksParsed([]); // Clear tracks on error
+        onTracksParsed([]);
       } finally {
         setIsParsing(false);
-        onParsingStateChange(false); // Notify parent: END
+        onParsingStateChange(false);
       }
     },
     [onTracksParsed, onParsingStateChange]
@@ -86,92 +112,166 @@ export default function FileUpload({
   });
 
   const handleReset = () => {
-    setFileName(null);
-    onTracksParsed([]);
+    if (dropzoneRef.current) {
+      gsap.to(dropzoneRef.current, {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.2,
+        onComplete: () => {
+          setFileName(null);
+          onTracksParsed([]);
+        },
+      });
+    } else {
+      setFileName(null);
+      onTracksParsed([]);
+    }
   };
 
   return (
     <div className="w-full">
-      {/* Show success message only when parsing is done AND we have a filename */}
       {fileName && !isParsing ? (
-        <div className="border-2 border-green-500/30 bg-green-500/10 rounded-lg p-6 text-center relative">
+        // Success state
+        <div
+          ref={successRef}
+          className="glass-card p-8 text-center relative overflow-hidden"
+        >
+          {/* Decorative gradient background */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.3) 0%, transparent 60%)',
+            }}
+          />
+
+          {/* Close button */}
           <button
             onClick={handleReset}
-            className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-elevated)] transition-all duration-300 cursor-pointer group"
           >
-            <X className="w-5 h-5" />
+            <XMarkIcon className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors" />
           </button>
-          <div className="flex items-center justify-center mb-2">
-            <CheckCircle className="w-10 h-10 text-green-400" />
+
+          {/* Success icon with glow */}
+          <div className="relative inline-flex items-center justify-center mb-4">
+            <div className="absolute w-20 h-20 rounded-full bg-ocean-500/20 animate-ping" />
+            <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center shadow-neon-ocean">
+              <CheckCircleIcon className="w-8 h-8 text-white" />
+            </div>
           </div>
-          <p className="text-green-300 font-medium">File uploaded successfully!</p>
-          <p className="text-sm text-green-400 mt-1">{fileName}</p>
-          <p className="text-xs text-gray-400 mt-2">
-            Ready to create YouTube playlist
+
+          <h3
+            className="text-xl font-bold text-[var(--text-primary)] mb-2"
+            style={{ fontFamily: "'Clash Display', sans-serif" }}
+          >
+            File Uploaded Successfully!
+          </h3>
+
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <DocumentTextIcon className="w-5 h-5 text-ocean-500" />
+            <span className="text-[var(--text-secondary)] font-medium">
+              {fileName}
+            </span>
+          </div>
+
+          <p className="text-sm text-[var(--text-muted)]">
+            Ready to create your YouTube playlist
           </p>
         </div>
       ) : (
-        // Show dropzone or parsing state
+        // Dropzone state
         <div
+          ref={dropzoneRef}
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            isDragActive
-              ? 'border-blue-400 bg-blue-500/10'
-              : 'border-gray-600 hover:border-gray-500 bg-white/5 hover:bg-white/10'
-          } ${isParsing ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`glass-card p-10 text-center relative overflow-hidden transition-all duration-500 cursor-pointer ${isDragActive ? 'ring-2 ring-coral-500/50' : ''
+            } ${isParsing ? 'opacity-70 cursor-wait' : ''}`}
         >
           <input {...getInputProps()} disabled={isParsing} />
 
+          {/* Animated border gradient on drag */}
+          {isDragActive && (
+            <div
+              className="absolute inset-0 rounded-3xl"
+              style={{
+                background:
+                  'linear-gradient(90deg, rgba(255, 107, 69, 0.2) 0%, rgba(245, 158, 11, 0.2) 50%, rgba(20, 184, 166, 0.2) 100%)',
+                animation: 'shimmer 1.5s linear infinite',
+                backgroundSize: '200% 100%',
+              }}
+            />
+          )}
+
           {isParsing ? (
-            <div className="flex flex-col items-center">
-              <svg
-                className="animate-spin h-8 w-8 text-blue-400 mb-3"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+            // Loading state
+            <div className="flex flex-col items-center relative z-10">
+              {/* Vinyl record loading animation */}
+              <div className="relative w-24 h-24 mb-6">
+                <div className="absolute inset-0 vinyl-record animate-spin" style={{ animationDuration: '2s' }} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-coral-500 to-amber-500" />
+                </div>
+              </div>
+
+              <p
+                className="text-[var(--text-primary)] font-semibold mb-2"
+                style={{ fontFamily: "'Clash Display', sans-serif" }}
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <p className="text-gray-300">Processing CSV file...</p>
-              <p className="text-xs text-gray-500 mt-1">
-                {fileName || 'This may take a moment'}
+                Processing Your Music...
               </p>
+              <p className="text-sm text-[var(--text-muted)]">
+                {fileName || 'Analyzing your Shazam data'}
+              </p>
+
+              {/* Progress bar */}
+              <div className="w-48 h-1.5 bg-[var(--surface)] rounded-full mt-4 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-coral-500 via-amber-500 to-ocean-500 shimmer"
+                  style={{ width: '100%' }}
+                />
+              </div>
             </div>
           ) : (
-            <div>
-              <div className="flex justify-center mb-3">
-                <UploadCloud className="w-12 h-12 text-gray-500" />
+            // Ready state
+            <div className="relative z-10">
+              {/* Upload icon with glow effect */}
+              <div className="relative inline-flex items-center justify-center mb-6">
+                <div
+                  className={`absolute w-24 h-24 rounded-full transition-all duration-500 ${isDragActive ? 'scale-110 bg-coral-500/20' : 'scale-100 bg-coral-500/10'
+                    }`}
+                />
+                <div
+                  className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 ${isDragActive
+                      ? 'bg-gradient-to-br from-coral-500 to-amber-500 shadow-neon-coral'
+                      : 'bg-[var(--surface-elevated)]'
+                    }`}
+                >
+                  <ArrowUpTrayIcon
+                    className={`w-10 h-10 transition-colors duration-500 ${isDragActive ? 'text-white' : 'text-coral-500'
+                      }`}
+                  />
+                </div>
               </div>
-              <p className="text-gray-300 mb-2">
+
+              <h3
+                className="text-xl font-bold text-[var(--text-primary)] mb-2"
+                style={{ fontFamily: "'Clash Display', sans-serif" }}
+              >
+                {isDragActive ? 'Drop it like it\'s hot!' : 'Drop Your Music File'}
+              </h3>
+
+              <p className="text-[var(--text-secondary)] mb-6">
                 {isDragActive
-                  ? 'Drop the CSV file here...'
-                  : 'Drag & drop your Shazam CSV file, or click to select'}
+                  ? 'Release to upload your Shazam CSV'
+                  : 'Drag & drop your Shazam CSV file here, or click to browse'}
               </p>
-              <p className="text-sm text-gray-500 mb-3">
-                Must be a .csv file exported from Shazam
-              </p>
-              <div className="bg-gray-900/50 rounded-lg p-3 text-left">
-                <p className="text-xs text-gray-400 font-medium mb-1">
-                  Expected format:
-                </p>
-                <p className="text-xs text-gray-500">
-                  Columns: Title, Artist, Album (optional)
-                </p>
-                <p className="text-xs text-gray-500">
-                  Example: &quot;Little Dark Age,MGMT&quot;
-                </p>
+
+              {/* File format info */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface)] border border-[var(--border)]">
+                <div className="w-2 h-2 rounded-full bg-coral-500" />
+                <span className="text-sm text-[var(--text-muted)]">
+                  Accepts .csv files from Shazam
+                </span>
               </div>
             </div>
           )}
