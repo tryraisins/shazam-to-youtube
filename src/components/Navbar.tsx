@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from './ThemeProvider';
-import { SunIcon, MoonIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
@@ -9,78 +9,35 @@ export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
     const navRef = useRef<HTMLElement>(null);
     const logoRef = useRef<HTMLDivElement>(null);
-    const toggleRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        // Entrance animation
         const ctx = gsap.context(() => {
             gsap.fromTo(
                 navRef.current,
-                { y: -100, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: 'elastic.out(1, 0.5)', delay: 0.2 }
-            );
-
-            gsap.fromTo(
-                logoRef.current,
-                { scale: 0, rotation: -180 },
-                { scale: 1, rotation: 0, duration: 0.8, ease: 'back.out(1.7)', delay: 0.5 }
+                { y: -40, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1.2, ease: 'expo.out', delay: 0.1 }
             );
         });
-
         return () => ctx.revert();
     }, []);
 
-    const handleToggleHover = (isEntering: boolean) => {
-        if (toggleRef.current) {
-            gsap.to(toggleRef.current, {
-                scale: isEntering ? 1.1 : 1,
-                rotation: isEntering ? 15 : 0,
-                duration: 0.3,
-                ease: 'power2.out',
-            });
-        }
-    };
-
-    const handleToggleClick = () => {
-        if (toggleRef.current) {
-            gsap.to(toggleRef.current, {
-                rotation: 360,
-                duration: 0.5,
-                ease: 'power2.inOut',
-                onComplete: () => {
-                    gsap.set(toggleRef.current, { rotation: 0 });
-                },
-            });
-        }
+    const handleThemeToggle = () => {
         toggleTheme();
     };
 
     return (
         <nav
             ref={navRef}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-3xl opacity-0"
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-50 opacity-0"
         >
-            <div className="glass-navbar rounded-full px-6 py-3 flex items-center justify-between">
+            <div className="glass-navbar rounded-full px-5 py-2.5 flex items-center justify-between gap-8 border border-border">
                 {/* Logo section */}
                 <div className="flex items-center gap-3">
-                    <div
-                        ref={logoRef}
-                        className="relative w-10 h-10 flex items-center justify-center"
-                    >
-                        {/* Animated glow ring */}
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-coral-500 via-amber-500 to-ocean-500 opacity-75 blur-sm animate-pulse-glow" />
-
-                        {/* Inner circle with icon */}
-                        <div className="relative w-full h-full rounded-full bg-gradient-to-br from-coral-500 to-amber-500 flex items-center justify-center shadow-lg">
-                            <MusicalNoteIcon className="w-5 h-5 text-white" />
-                        </div>
+                    <div ref={logoRef} className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-background">
+                        <PlayCircleIcon className="w-5 h-5" />
                     </div>
-
-                    <span
-                        className="font-display font-bold text-xl tracking-tight"
-                        style={{ fontFamily: "'Clash Display', sans-serif" }}
-                    >
-                        <span className="gradient-text">EchoList</span>
+                    <span className="font-display font-bold text-lg tracking-tight text-text-primary">
+                        EchoList
                     </span>
                 </div>
 
@@ -88,51 +45,31 @@ export default function Navbar() {
                 <div className="hidden sm:flex items-center gap-6">
                     <a
                         href="#how-it-works"
-                        className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-300 cursor-pointer"
+                        className="text-sm font-medium text-text-secondary hover:text-primary transition-colors duration-300"
                     >
-                        How it Works
+                        Features
                     </a>
                     <a
                         href="https://www.shazam.com/myshazam"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-300 cursor-pointer"
+                        className="text-sm font-medium text-text-secondary hover:text-primary transition-colors duration-300 relative group"
                     >
-                        Get Shazam Data
+                        Get Data
+                        <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-secondary transition-all duration-300 group-hover:w-full"></span>
                     </a>
                 </div>
 
                 {/* Theme toggle */}
                 <button
-                    ref={toggleRef}
-                    onClick={handleToggleClick}
-                    onMouseEnter={() => handleToggleHover(true)}
-                    onMouseLeave={() => handleToggleHover(false)}
-                    className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer group"
-                    style={{
-                        background: theme === 'dark'
-                            ? 'linear-gradient(135deg, rgba(65, 234, 212, 0.2) 0%, rgba(251, 255, 18, 0.2) 100%)'
-                            : 'linear-gradient(135deg, rgba(255, 32, 110, 0.2) 0%, rgba(251, 255, 18, 0.2) 100%)',
-                    }}
+                    onClick={handleThemeToggle}
+                    className="w-8 h-8 rounded-full flex items-center justify-center bg-surface hover:bg-surface-elevated border border-border transition-colors duration-300"
                     aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                 >
-                    {/* Glow effect on hover */}
-                    <div
-                        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{
-                            background: theme === 'dark'
-                                ? 'linear-gradient(135deg, rgba(65, 234, 212, 0.3) 0%, rgba(251, 255, 18, 0.3) 100%)'
-                                : 'linear-gradient(135deg, rgba(255, 32, 110, 0.3) 0%, rgba(251, 255, 18, 0.3) 100%)',
-                            boxShadow: theme === 'dark'
-                                ? '0 0 20px rgba(65, 234, 212, 0.4)'
-                                : '0 0 20px rgba(255, 32, 110, 0.4)',
-                        }}
-                    />
-
                     {theme === 'dark' ? (
-                        <SunIcon className="w-5 h-5 text-amber-400 relative z-10" />
+                        <SunIcon className="w-4 h-4 text-primary" />
                     ) : (
-                        <MoonIcon className="w-5 h-5 text-ocean-600 relative z-10" />
+                        <MoonIcon className="w-4 h-4 text-primary" />
                     )}
                 </button>
             </div>
