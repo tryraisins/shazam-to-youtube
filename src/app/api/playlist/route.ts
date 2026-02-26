@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getYouTubeClient } from "@/lib/youtube-auth";
 import { searchYouTubeVideos } from "@/lib/youtube-search";
-import { ShazamTrack } from "@/lib/csv-parser";
 import { withRateLimit } from "@/lib/security/withRateLimit";
-
-interface PlaylistRequest {
-  tracks: ShazamTrack[];
-  accessToken: string;
-  playlistTitle: string;
-  action: "create" | "overwrite" | "update";
-}
 
 async function handler(request: NextRequest) {
   try {

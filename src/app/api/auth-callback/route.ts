@@ -1,13 +1,13 @@
 // app/api/auth-callback/route.ts
-import { NextResponse } from 'next/server';
-import { OAuth2Client, Credentials } from 'google-auth-library';
-import { google, youtube_v3 } from 'googleapis';
+import { NextResponse } from "next/server";
+import { OAuth2Client } from "google-auth-library";
+import { google } from "googleapis";
 
 // --- Setup OAuth Client (needs to be consistent with the other file) ---
 const oauth2Client = new OAuth2Client(
   process.env.YOUTUBE_CLIENT_ID,
   process.env.YOUTUBE_CLIENT_SECRET,
-  process.env.YOUTUBE_REDIRECT_URI
+  process.env.YOUTUBE_REDIRECT_URI,
 );
 
 // --- Temporary Storage for CSV Data (must be consistent) ---
@@ -17,20 +17,22 @@ const tempSongStorage = new Map<string, { artist: string; title: string }[]>();
 
 // A simple in-memory store for the mock data since we don't have session/DB
 // For a real test, you'd transfer the song data from /api/upload-csv to here.
-const stateKey = 'mock_state_for_demo';
+const stateKey = "mock_state_for_demo";
 tempSongStorage.set(stateKey, [
-    { artist: 'The Weeknd', title: 'Blinding Lights' },
-    { artist: 'Dua Lipa', title: 'Don\'t Start Now' },
+  { artist: "The Weeknd", title: "Blinding Lights" },
+  { artist: "Dua Lipa", title: "Don't Start Now" },
 ]);
-
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const code = url.searchParams.get('code');
-  const state = url.searchParams.get('state') || stateKey; // Use mock key if state is missing
-  
+  const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state") || stateKey; // Use mock key if state is missing
+
   if (!code) {
-    return NextResponse.json({ success: false, message: 'Authorization code missing.' }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "Authorization code missing." },
+      { status: 400 },
+    );
   }
 
   try {
@@ -43,33 +45,37 @@ export async function GET(req: Request) {
     tempSongStorage.delete(state); // Clean up temp storage
 
     if (!songs || songs.length === 0) {
-      return NextResponse.json({ success: false, message: 'Song data not found or expired.' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Song data not found or expired." },
+        { status: 404 },
+      );
     }
 
     // 3. Initialize YouTube API client
     const youtube = google.youtube({
-      version: 'v3',
+      version: "v3",
       auth: oauth2Client,
     });
 
     // 4. Create the new playlist
     const playlistTitle = `Shazam Export - ${new Date().toLocaleDateString()}`;
     const playlistResponse = await youtube.playlists.insert({
-      part: ['snippet', 'status'],
+      part: ["snippet", "status"],
       requestBody: {
         snippet: {
           title: playlistTitle,
-          description: 'Playlist created from a Shazam CSV export using Next.js and YouTube Data API.',
+          description:
+            "Playlist created from a Shazam CSV export using Next.js and YouTube Data API.",
         },
         status: {
-          privacyStatus: 'private', // Can be 'public', 'private', or 'unlisted'
+          privacyStatus: "private", // Can be 'public', 'private', or 'unlisted'
         },
       },
     });
 
     const playlistId = playlistResponse.data.id;
     if (!playlistId) {
-        throw new Error("Failed to create playlist.");
+      throw new Error("Failed to create playlist.");
     }
 
     // 5. Search for and add each song to the playlist
@@ -79,10 +85,10 @@ export async function GET(req: Request) {
       // YouTube Search API to find the best matching video
       const searchQuery = `${song.artist} ${song.title} official video`;
       const searchResponse = await youtube.search.list({
-        part: ['snippet'],
+        part: ["snippet"],
         q: searchQuery,
         maxResults: 1,
-        type: ['video'],
+        type: ["video"],
       });
 
       const videoId = searchResponse.data.items?.[0]?.id?.videoId;
@@ -92,12 +98,12 @@ export async function GET(req: Request) {
 
         // Add video to the playlist
         await youtube.playlistItems.insert({
-          part: ['snippet'],
+          part: ["snippet"],
           requestBody: {
             snippet: {
               playlistId: playlistId,
               resourceId: {
-                kind: 'youtube#video',
+                kind: "youtube#video",
                 videoId: videoId,
               },
             },
@@ -111,14 +117,19 @@ export async function GET(req: Request) {
 
     // Redirect to a success page or the new playlist URL
     const successUrl = `/?status=success&playlistId=${playlistId}`;
-    return NextResponse.redirect(new URL(successUrl, process.env.YOUTUBE_REDIRECT_URI).origin);
-    
+    return NextResponse.redirect(
+      new URL(successUrl, process.env.YOUTUBE_REDIRECT_URI).origin,
+    );
   } catch (error) {
-    console.error('Playlist creation error:', error);
-    return NextResponse.json({ 
-        success: false, 
-        message: 'Failed to create playlist or process callback. Check console for details.' 
-    }, { status: 500 });
+    console.error("Playlist creation error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          "Failed to create playlist or process callback. Check console for details.",
+      },
+      { status: 500 },
+    );
   }
 }
 
