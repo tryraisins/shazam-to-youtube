@@ -9,7 +9,6 @@ import {
   MusicalNoteIcon,
   PlayCircleIcon,
   SparklesIcon,
-  ArrowDownIcon,
 } from '@heroicons/react/24/outline';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';

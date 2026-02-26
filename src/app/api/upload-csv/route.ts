@@ -2,9 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withRateLimit } from "@/lib/security/withRateLimit";
 import { OAuth2Client } from "google-auth-library";
-import csv from "csv-parser";
-import { Writable } from "stream";
-import formidable from "formidable";
 
 // Define the scope needed for YouTube playlist creation
 const SCOPES = ["https://www.googleapis.com/auth/youtube"];
@@ -20,33 +17,16 @@ const oauth2Client = new OAuth2Client(
 // Keyed by a simple 'state' or session ID
 const tempSongStorage = new Map<string, { artist: string; title: string }[]>();
 
-// Helper to parse the form data (file upload)
-function parseForm(req: Request) {
-  return new Promise<{ fields: formidable.Fields; files: formidable.Files }>(
-    (resolve, reject) => {
-      // formidable needs the raw Node.js request object, which is available via 'req.blob()'
-      // We must handle the stream manually in Next.js Edge Runtime or Node.js environment
-      // For simplicity here, we'll assume a Node.js environment (default next.js handler behavior)
-      // *In a real app, you'd use a different file handling approach like 'form-data' or 'busboy' or a specific Vercel blob storage.*
-
-      // **SIMPLIFIED FILE PARSING FOR DEMO PURPOSES (requires specific Next.js config or a Node.js-friendly environment)**
-      // For the most compatible Next.js handler (App Router), we'll read the request body directly.
-      reject(
-        new Error(
-          "File parsing is complex in this environment; please use a library like 'form-data' or an API route configured for file uploads.",
-        ),
-      );
-    },
-  );
-}
-
 // **Simplified Mock Function for CSV Parsing**
 // Replace this with a robust implementation that reads the actual file stream.
 async function mockParseCsv(
   formData: FormData,
 ): Promise<{ artist: string; title: string }[]> {
   // In a full implementation, you'd read the 'shazamCsv' file, and parse it.
-  console.log("Mock parsing CSV - expecting 'Artist' and 'Title' columns.");
+  console.log(
+    "Mock parsing CSV - expecting 'Artist' and 'Title' columns. formData:",
+    formData,
+  );
 
   // A typical Shazam export might have 'Artist' and 'Track Name' columns
   const mockData = [

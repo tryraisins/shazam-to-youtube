@@ -35,7 +35,6 @@ export default function AnimatedBackground() {
 
   // Generate floating elements on mount
   useEffect(() => {
-    const types: FloatingElement['type'][] = ['vinyl', 'wave', 'note', 'eq'];
     const generated: FloatingElement[] = [];
 
     // Generate vinyl records (larger, fewer)

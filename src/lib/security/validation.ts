@@ -36,12 +36,13 @@ export async function validateRequest<T>(
     return { success: true, data };
   } catch (error) {
     if (error instanceof z.ZodError) {
+      const zodError = error as z.ZodError<any>;
       return {
         success: false,
         error: NextResponse.json(
           {
             error: "Validation failed",
-            details: error.errors.map((e) => ({
+            details: zodError.errors.map((e) => ({
               field: e.path.join("."),
               message: e.message,
             })),
