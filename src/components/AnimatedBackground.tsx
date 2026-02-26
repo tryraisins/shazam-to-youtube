@@ -199,8 +199,8 @@ export default function AnimatedBackground() {
               className="w-full h-full rounded-full animate-wave"
               style={{
                 background: theme === 'dark'
-                  ? 'radial-gradient(circle, rgba(255, 107, 69, 0.1) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 107, 69, 0.08) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 32, 110, 0.3) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(65, 234, 212, 0.2) 0%, transparent 70%)',
                 animationDuration: `${element.duration}s`,
                 animationDelay: `${element.delay}s`,
               }}
@@ -243,8 +243,8 @@ export default function AnimatedBackground() {
         className="absolute inset-0"
         style={{
           background: theme === 'dark'
-            ? 'radial-gradient(ellipse at 50% 0%, transparent 0%, rgba(10, 10, 15, 0.8) 100%)'
-            : 'radial-gradient(ellipse at 50% 0%, transparent 0%, rgba(250, 248, 245, 0.6) 100%)',
+            ? 'radial-gradient(ellipse at 50% 0%, transparent 0%, #05050A 100%)'
+            : 'radial-gradient(ellipse at 50% 0%, transparent 0%, #0A0A14 100%)',
         }}
       />
 

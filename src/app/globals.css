@@ -3,59 +3,59 @@
 
 /* CSS Variables for theming */
 :root {
-  /* Light theme - warm, inviting */
-  --foreground: #1a1a2e;
-  --background: #faf8f5;
-  --background-start: #fdf6f0;
-  --background-end: #f0ebe4;
-  --surface: rgba(255, 255, 255, 0.7);
-  --surface-elevated: rgba(255, 255, 255, 0.85);
-  --border: rgba(0, 0, 0, 0.08);
-  --border-focus: rgba(255, 107, 69, 0.5);
-  --text-primary: #1a1a2e;
-  --text-secondary: #4a4a68;
-  --text-muted: #8b8ba3;
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.8);
-  --glass-shadow: rgba(0, 0, 0, 0.1);
+  /* High Contrast / Deep Neon Theme */
+  --foreground: #f8fafc;
+  --background: #05050a;
+  --background-start: #0a0a14;
+  --background-end: #030308;
+  --surface: rgba(20, 20, 35, 0.4);
+  --surface-elevated: rgba(30, 30, 50, 0.6);
+  --border: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(65, 234, 212, 0.5); /* Neon Cyan focus */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --glass-bg: rgba(5, 5, 10, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
   --gradient-primary: linear-gradient(
     135deg,
-    #ff6b45 0%,
-    #f59e0b 50%,
-    #14b8a6 100%
+    #ff206e 0%,
+    #fbff12 50%,
+    #41ead4 100%
   );
-  --gradient-accent: linear-gradient(135deg, #ff8f6e 0%, #fbbf24 100%);
-  --blob-1: rgba(255, 107, 69, 0.25);
-  --blob-2: rgba(20, 184, 166, 0.2);
-  --blob-3: rgba(245, 158, 11, 0.2);
+  --gradient-accent: linear-gradient(135deg, #ff206e 0%, #fbff12 100%);
+  --blob-1: rgba(255, 32, 110, 0.2);
+  --blob-2: rgba(65, 234, 212, 0.2);
+  --blob-3: rgba(251, 255, 18, 0.15);
 }
 
 .dark {
-  /* Dark theme - deep, atmospheric */
-  --foreground: #f5f5f7;
-  --background: #0a0a0f;
-  --background-start: #0d0d14;
-  --background-end: #12121a;
-  --surface: rgba(255, 255, 255, 0.05);
-  --surface-elevated: rgba(255, 255, 255, 0.1);
-  --border: rgba(255, 255, 255, 0.1);
-  --border-focus: rgba(255, 107, 69, 0.6);
-  --text-primary: #f5f5f7;
+  /* Keep aligned with the core Deep Neon aesthetic */
+  --foreground: #f8fafc;
+  --background: #030305;
+  --background-start: #05050a;
+  --background-end: #020203;
+  --surface: rgba(15, 15, 25, 0.6);
+  --surface-elevated: rgba(25, 25, 40, 0.8);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(65, 234, 212, 0.6);
+  --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
-  --glass-bg: rgba(30, 30, 40, 0.7);
+  --glass-bg: rgba(3, 3, 5, 0.75);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: rgba(0, 0, 0, 0.4);
+  --glass-shadow: rgba(0, 0, 0, 0.6);
   --gradient-primary: linear-gradient(
     135deg,
-    #ff6b45 0%,
-    #f59e0b 50%,
-    #14b8a6 100%
+    #ff206e 0%,
+    #fbff12 50%,
+    #41ead4 100%
   );
-  --gradient-accent: linear-gradient(135deg, #ff8f6e 0%, #fbbf24 100%);
-  --blob-1: rgba(255, 107, 69, 0.15);
-  --blob-2: rgba(20, 184, 166, 0.12);
-  --blob-3: rgba(245, 158, 11, 0.12);
+  --gradient-accent: linear-gradient(135deg, #ff206e 0%, #fbff12 100%);
+  --blob-1: rgba(255, 32, 110, 0.15);
+  --blob-2: rgba(65, 234, 212, 0.15);
+  --blob-3: rgba(251, 255, 18, 0.12);
 }
 
 @theme inline {

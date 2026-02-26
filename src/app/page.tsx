@@ -137,7 +137,7 @@ export default function Home() {
             <div
               className="absolute inset-0 opacity-10"
               style={{
-                background: 'radial-gradient(circle at 0% 0%, rgba(255, 107, 69, 0.4) 0%, transparent 50%)',
+                background: 'radial-gradient(circle at 0% 0%, rgba(255, 32, 110, 0.25) 0%, transparent 50%)',
               }}
             />
 
@@ -201,7 +201,7 @@ export default function Home() {
             <div
               className="absolute inset-0 opacity-10"
               style={{
-                background: 'radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.4) 0%, transparent 50%)',
+                background: 'radial-gradient(circle at 100% 0%, rgba(251, 255, 18, 0.2) 0%, transparent 50%)',
               }}
             />
 
@@ -241,7 +241,7 @@ export default function Home() {
               <div
                 className="absolute inset-0 opacity-10"
                 style={{
-                  background: 'radial-gradient(circle at 50% 100%, rgba(20, 184, 166, 0.4) 0%, transparent 50%)',
+                  background: 'radial-gradient(circle at 50% 100%, rgba(65, 234, 212, 0.25) 0%, transparent 50%)',
                 }}
               />
 

@@ -195,7 +195,7 @@ export default function FileUpload({
               className="absolute inset-0 rounded-3xl"
               style={{
                 background:
-                  'linear-gradient(90deg, rgba(255, 107, 69, 0.2) 0%, rgba(245, 158, 11, 0.2) 50%, rgba(20, 184, 166, 0.2) 100%)',
+                  'linear-gradient(90deg, rgba(255, 32, 110, 0.2) 0%, rgba(251, 255, 18, 0.2) 50%, rgba(65, 234, 212, 0.2) 100%)',
                 animation: 'shimmer 1.5s linear infinite',
                 backgroundSize: '200% 100%',
               }}
@@ -242,8 +242,8 @@ export default function FileUpload({
                 />
                 <div
                   className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 ${isDragActive
-                      ? 'bg-gradient-to-br from-coral-500 to-amber-500 shadow-neon-coral'
-                      : 'bg-[var(--surface-elevated)]'
+                    ? 'bg-gradient-to-br from-coral-500 to-amber-500 shadow-neon-coral'
+                    : 'bg-[var(--surface-elevated)]'
                     }`}
                 >
                   <ArrowUpTrayIcon

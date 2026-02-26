@@ -111,8 +111,8 @@ export default function Navbar() {
                     className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer group"
                     style={{
                         background: theme === 'dark'
-                            ? 'linear-gradient(135deg, rgba(255, 107, 69, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%)'
-                            : 'linear-gradient(135deg, rgba(20, 184, 166, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)',
+                            ? 'linear-gradient(135deg, rgba(65, 234, 212, 0.2) 0%, rgba(251, 255, 18, 0.2) 100%)'
+                            : 'linear-gradient(135deg, rgba(255, 32, 110, 0.2) 0%, rgba(251, 255, 18, 0.2) 100%)',
                     }}
                     aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                 >
@@ -121,11 +121,11 @@ export default function Navbar() {
                         className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         style={{
                             background: theme === 'dark'
-                                ? 'linear-gradient(135deg, rgba(255, 107, 69, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%)'
-                                : 'linear-gradient(135deg, rgba(20, 184, 166, 0.3) 0%, rgba(99, 102, 241, 0.3) 100%)',
+                                ? 'linear-gradient(135deg, rgba(65, 234, 212, 0.3) 0%, rgba(251, 255, 18, 0.3) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 32, 110, 0.3) 0%, rgba(251, 255, 18, 0.3) 100%)',
                             boxShadow: theme === 'dark'
-                                ? '0 0 20px rgba(255, 107, 69, 0.4)'
-                                : '0 0 20px rgba(20, 184, 166, 0.4)',
+                                ? '0 0 20px rgba(65, 234, 212, 0.4)'
+                                : '0 0 20px rgba(255, 32, 110, 0.4)',
                         }}
                     />
 

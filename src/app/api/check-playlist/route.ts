@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
-import { getYouTubeClient } from '@/lib/youtube-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { getYouTubeClient } from "@/lib/youtube-auth";
+import { withRateLimit } from "@/lib/security/withRateLimit";
 
-export async function POST(request: Request) {
+async function handler(request: NextRequest) {
   try {
     const { accessToken, playlistTitle } = await request.json();
 
     if (!accessToken || !playlistTitle) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
@@ -16,25 +17,27 @@ export async function POST(request: Request) {
 
     // Search for existing playlists with the same name
     const playlistsResponse = await youtube.playlists.list({
-      part: ['snippet'],
+      part: ["snippet"],
       mine: true,
-      maxResults: 50
+      maxResults: 50,
     });
 
     const existingPlaylist = playlistsResponse.data.items?.find(
-      playlist => playlist.snippet?.title?.toLowerCase() === playlistTitle.toLowerCase()
+      (playlist) =>
+        playlist.snippet?.title?.toLowerCase() === playlistTitle.toLowerCase(),
     );
 
     return NextResponse.json({
       exists: !!existingPlaylist,
-      playlistId: existingPlaylist?.id
+      playlistId: existingPlaylist?.id,
     });
-
   } catch (error) {
-    console.error('Error checking playlist:', error);
+    console.error("Error checking playlist:", error);
     return NextResponse.json(
-      { error: 'Failed to check existing playlists' },
-      { status: 500 }
+      { error: "Failed to check existing playlists" },
+      { status: 500 },
     );
   }
 }
+
+export const POST = withRateLimit(handler, "api");

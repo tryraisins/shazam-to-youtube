@@ -14,44 +14,44 @@ module.exports = {
         body: ["Satoshi", "sans-serif"],
       },
       colors: {
-        // Primary palette - warm coral/sunset inspired for music vibes
+        // Primary palette - Neon Pink
         coral: {
-          50: "#fff5f2",
-          100: "#ffe8e1",
-          200: "#ffd5c8",
-          300: "#ffb8a0",
-          400: "#ff8f6e",
-          500: "#ff6b45",
-          600: "#e8472a",
-          700: "#c33520",
-          800: "#a12e1e",
-          900: "#852b1f",
+          50: "#ffe5f0",
+          100: "#ffcce2",
+          200: "#ff99c5",
+          300: "#FF73A5",
+          400: "#FF4D8B",
+          500: "#FF206E", // Main Cyber Pink
+          600: "#E0185D",
+          700: "#C0144D",
+          800: "#A0103E",
+          900: "#800B30",
         },
-        // Secondary - deep teal/ocean
+        // Secondary - Neon Cyan
         ocean: {
-          50: "#f0fdfc",
-          100: "#ccfbf6",
-          200: "#99f6ed",
-          300: "#5eead4",
-          400: "#2dd4bf",
-          500: "#14b8a6",
-          600: "#0d9488",
-          700: "#0f766e",
-          800: "#115e59",
-          900: "#134e4a",
+          50: "#e0fcf9",
+          100: "#c2f9f2",
+          200: "#85f3e5",
+          300: "#91F4E7",
+          400: "#6AF0DF",
+          500: "#41EAD4", // Main Cyber Cyan
+          600: "#35C6B3",
+          700: "#2BA193",
+          800: "#227D72",
+          900: "#185850",
         },
-        // Accent - golden amber
+        // Accent - Neon Volt
         amber: {
-          50: "#fffbeb",
-          100: "#fef3c7",
-          200: "#fde68a",
-          300: "#fcd34d",
-          400: "#fbbf24",
-          500: "#f59e0b",
-          600: "#d97706",
-          700: "#b45309",
-          800: "#92400e",
-          900: "#78350f",
+          50: "#fcffd6",
+          100: "#fafdaj",
+          200: "#fbfe8a",
+          300: "#FDFF7A",
+          400: "#FCFF4D",
+          500: "#FBFF12", // Main Cyber Volt
+          600: "#D5D90F",
+          700: "#B0B30C",
+          800: "#8A8C0A",
+          900: "#656606",
         },
         // Glass surface colors
         glass: {

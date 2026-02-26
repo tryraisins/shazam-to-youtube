@@ -258,7 +258,7 @@ export default function PlaylistCreator({
         <div
           className="absolute inset-0 opacity-10"
           style={{
-            background: 'radial-gradient(circle at 100% 0%, rgba(255, 107, 69, 0.3) 0%, transparent 50%)',
+            background: 'radial-gradient(circle at 100% 0%, rgba(255, 32, 110, 0.25) 0%, transparent 50%)',
           }}
         />
 
@@ -386,7 +386,7 @@ export default function PlaylistCreator({
             <div
               className="absolute inset-0 opacity-20"
               style={{
-                background: 'radial-gradient(circle at 0% 100%, rgba(245, 158, 11, 0.3) 0%, transparent 50%)',
+                background: 'radial-gradient(circle at 0% 100%, rgba(251, 255, 18, 0.25) 0%, transparent 50%)',
               }}
             />
 
@@ -416,8 +416,8 @@ export default function PlaylistCreator({
                   <label
                     key={option.value}
                     className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${existingPlaylistAction === option.value
-                        ? 'bg-coral-500/10 border border-coral-500/30'
-                        : 'bg-[var(--surface)] border border-transparent hover:bg-[var(--surface-elevated)]'
+                      ? 'bg-coral-500/10 border border-coral-500/30'
+                      : 'bg-[var(--surface)] border border-transparent hover:bg-[var(--surface-elevated)]'
                       }`}
                   >
                     <input
@@ -430,8 +430,8 @@ export default function PlaylistCreator({
                     />
                     <div
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${existingPlaylistAction === option.value
-                          ? 'border-coral-500 bg-coral-500'
-                          : 'border-[var(--border)]'
+                        ? 'border-coral-500 bg-coral-500'
+                        : 'border-[var(--border)]'
                         }`}
                     >
                       {existingPlaylistAction === option.value && (
@@ -491,7 +491,7 @@ export default function PlaylistCreator({
             className="absolute inset-0 opacity-20"
             style={{
               background: result.success
-                ? 'radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.3) 0%, transparent 50%)'
+                ? 'radial-gradient(circle at 50% 0%, rgba(65, 234, 212, 0.25) 0%, transparent 50%)'
                 : 'radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.3) 0%, transparent 50%)',
             }}
           />
