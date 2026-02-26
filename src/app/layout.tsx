@@ -65,7 +65,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased min-h-screen">
+      <body className="antialiased min-h-screen" style={{ fontFamily: "'DM Sans', sans-serif" }}>
         <JsonLd />
         <ThemeProvider>
           <AnimatedBackground />
